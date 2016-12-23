@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 5c3cecaae824c9f4e923606d480e1797
+timeCreated: 1482418929
+licenseType: Pro
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Futura Md BT
+  fontNames:
+  - Futura Md BT
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

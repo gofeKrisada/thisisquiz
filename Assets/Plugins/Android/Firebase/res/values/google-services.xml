@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="firebase_database_url" translatable="false">https://quizclash-dbca1.firebaseio.com</string>
+  <string name="gcm_defaultSenderId" translatable="false">929844342816</string>
+  <string name="google_storage_bucket" translatable="false">quizclash-dbca1.appspot.com</string>
+  <string name="google_app_id" translatable="false">1:929844342816:android:ee94731d2a10562c</string>
+  <string name="default_web_client_id" translatable="false">929844342816-c6okas5rnf2btc9rsme1r4tk4oq461qp.apps.googleusercontent.com</string>
+</resources>

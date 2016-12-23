@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "929844342816",
+    "firebase_url": "https://quizclash-dbca1.firebaseio.com",
+    "project_id": "quizclash-dbca1",
+    "storage_bucket": "quizclash-dbca1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:929844342816:android:ee94731d2a10562c",
+        "android_client_info": {
+          "package_name": "com.GoFe.QuizClash"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "929844342816-c6okas5rnf2btc9rsme1r4tk4oq461qp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
