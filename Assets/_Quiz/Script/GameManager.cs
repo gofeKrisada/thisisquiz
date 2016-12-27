@@ -5,39 +5,114 @@ using UnityEngine.UI;
 
 public class GameState
 {
-   public int correctCount { get; set; }
-   public int wrongCount { get; set; }
-   public int difficult { get; set; }
+    public int rating {
+        get {
+            if (PlayerPrefs.HasKey("rating"))
+            {
+                return  PlayerPrefs.GetInt("rating");
 
+            }
+            else
+            {
+                PlayerPrefs.SetInt("rating", 0);
+                return PlayerPrefs.GetInt("rating");
+            }
+ 
+        }
+        set {
+            PlayerPrefs.SetInt("rating", value);
+        }
+    }// player rank  -pref
+
+  
+ 
+   public List<int> highScore { get; set; }
+  
+
+    public bool refreshingData { get; set; }
+
+    public enum GameSeq
+    {
+        loading,
+        main,
+        gameplay,
+        result
+    }
+    public enum GamePlaySeq
+    {
+        startQuestion,
+        playing,
+        timeout,
+        checkAnswer,
+        endQuestion
+        
+    }
+    public GameSeq curretState { get ; set; }
+    public GameSeq nexState { get; set; }
     public  GameState()
     {
-        correctCount = 0;
-        wrongCount = 0;
-        difficult = 0;
-    }
+
+        curretState = GameSeq.loading;
+    }//contrcut
+
+
 
 }//gameState
 
 
+
+
 public class GameManager : MonoBehaviour {
 
-    GameState gameState;
+    [Header("Window")]
+    public GameObject window_loading;
+    public GameObject window_main;
+    public GameObject window_gameplay;
+    public GameObject window_result;
+    public GameObject window_disconnected;
+
+    [Header("Panel")]
+    public GameObject panel_result;
+    public GameObject panel_highScore;
+
+    [Header("Other")]
+    public GameObject eventSystem;
+    public float animation_time;
+
+    [HideInInspector]
+    public GameState gameState;
+
+    private QuizManager quizManager;
+
     // Use this for initialization
-    void Start () {
+    void Awake () {
+        Init();
+   
+    }//start
+
+    public void Init()
+    {
         gameState = new GameState();
-     
-	}//start
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+        quizManager = GameObject.Find("[QuizManager]").GetComponent<QuizManager>();
+
+        OnChangeSeq(GameState.GameSeq.loading, GameState.GameSeq.main);
+
+
+    }
+
+    // Update is called once per frame
+    void Update () {
+
+        OnRefreshingData();
+        //if (Input.GetKeyDown(KeyCode.A))
+        //{
+        //    Application.LoadLevel("PreScene");
+
+        //}
 	}//update
 
-    private float timer;
-    public float baseTimer;
-
-    public GameObject eventSystem;
-    public GameObject UI_timerBar;
+    
 
     public void EnableInput(bool enable)
     {
@@ -45,78 +120,186 @@ public class GameManager : MonoBehaviour {
   
     }//enableInput
 
-    void OnQuestionStart()
+#region Button
+    public void Button_Start()
     {
-        timer = baseTimer;
-        EnableInput(true);
+        MoveWindow(window_loading, animation_time);
+        SetToggle(window_loading, 0);
 
-        GetQuestion();
+        AudioPlayer.Instance.Play(AudioPlayer.Instance.sfx_button);
 
+        NextSequnce(GameState.GameSeq.gameplay);
+    }//button action
 
-    }//OnQuestionStart
-
-    void OnQuestionEnd()
+    public void Button_OkayResult()
     {
-        EnableInput(false);
-        if (gameState.correctCount >= 5)
-        {
-            GameEnd();
-        }//correct 5
-        else if (gameState.wrongCount >= 3)
-        {
-            GameEnd();
-        }//wrong 3
+        MoveWindow(window_loading, animation_time);
+        SetToggle(window_loading, 0);
 
-    }//OnQuestionEnd
+        SetToggle(window_result, 0.5f);
 
+        AudioPlayer.Instance.Play(AudioPlayer.Instance.sfx_button);
 
+        gameState.curretState = GameState.GameSeq.loading;
+        OnChangeSeq(GameState.GameSeq.loading, GameState.GameSeq.main);
+    
+        
+    }//button action
 
-    void QuestionTimer()
+    public void Button_Restart()
     {
+        AudioPlayer.Instance.StopBGM();
+        Application.LoadLevel("ThisIsQuiz");
+    }//button action
 
-        if (timer > 0)
+#endregion
+
+    private void NextSequnce(GameState.GameSeq nextSeq)
+    {
+     
+       if (nextSeq == GameState.GameSeq.main)
         {
-            timer -= Time.deltaTime;
-            UI_timerBar.GetComponent<Image>().fillAmount = 1 - timer / baseTimer;
+            gameState.curretState = GameState.GameSeq.main;
+            SetToggle(window_main, 0);
+
+
+            AudioPlayer.Instance.PlayBGM(AudioPlayer.Instance.bgm_theme);
+   
+                gameState.highScore = FireBaseProvider.Instance.GetScore();
+
+            for (int i = 0; i < 4; i++)
+                panel_highScore.transform.GetChild(i).GetChild(0).GetChild(1).GetComponent<Text>().text
+                    = gameState.highScore[i].ToString();
+
+                SetToggle(window_loading, animation_time);
+                MoveWindow(window_loading, animation_time);
+                
+                
+
+
+        }//
+        else if (nextSeq == GameState.GameSeq.gameplay)
+        {
+            gameState.curretState = GameState.GameSeq.gameplay ;
+
+            AudioPlayer.Instance.PlayBGM(AudioPlayer.Instance.bgm_gameplay,2);
+
+            quizManager.GameStart();
+           
+            MoveWindow(window_loading, animation_time, 2);
+            SetToggle(window_loading, animation_time*2 + 2);
+           
+
+            SetToggle(window_main,  2);
+            SetToggle(window_gameplay,  2);
+
+ 
+
+
+        }//
+   
+    }//s
+    void OnChangeSeq(GameState.GameSeq currentState, GameState.GameSeq nextState)
+    {
+        gameState.refreshingData = true;
+        gameState.nexState = nextState;
+
+        FireBaseProvider.Instance.snapshot = null;
+        FireBaseProvider.Instance.RefreshData();
+        if (currentState == GameState.GameSeq.loading)
+        {
+            if (window_loading.activeSelf == false)
+                window_loading.SetActive(true);
+
+        }//loading
+    }//
+
+
+    public void OnResult(string result,int score)
+    {
+        SetToggle(window_gameplay, 0.5f);
+        SetToggle(window_result, 0);
+       
+
+        AudioPlayer.Instance.StopBGM();
+        AudioPlayer.Instance.Play(AudioPlayer.Instance.sfx_result);
+
+        panel_result.transform.GetChild(1).GetComponent<Text>().text = result;
+        panel_result.transform.GetChild(2).GetComponent<Text>().text = score.ToString();
+
+        FireBaseProvider.Instance.SetScore(score, gameState.highScore);
+       
+    }//show result
+
+    #region Animation
+    public void SetToggle(GameObject obj,float delay)
+    {
+        if(delay==0)
+            obj.SetActive(!obj.activeSelf);
+        else
+        StartCoroutine(DelaySetActive(obj, delay));
+    }//setActive
+
+    private IEnumerator DelaySetActive(GameObject obj,float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        obj.SetActive(!obj.activeSelf);
+    }//
+    public void MoveWindow(GameObject obj, float time)
+    {
+        if (obj.activeSelf) {
+            LeanTween.moveY(obj, -Screen.height/2, time).setEase(LeanTweenType.easeInOutQuart);
         }
         else
         {
-            timer = 0;
-            gameState.wrongCount += 1;
-            OnQuestionEnd();
-
-        }// question timeout
+            LeanTween.moveY(obj, Screen.height / 2, time).setEase(LeanTweenType.easeInOutQuart);
+        }
 
 
-    }//gameTimer
-
-    void CheckAnswer(bool correctAnswer)
+    }//moveWindow
+    public void MoveWindow(GameObject obj, float time,float delay)
     {
-
-        if (correctAnswer)
+   
+        if (obj.activeSelf)
         {
-            gameState.correctCount++;
-            AudioPlayer.Instance.Play(AudioPlayer.Instance.sfx_correct);
-        }//correct
+            LeanTween.moveY(obj, -Screen.height / 2, time).setEase(LeanTweenType.easeInOutQuart).setDelay(delay);
+        }
         else
         {
-            gameState.wrongCount++;
-            AudioPlayer.Instance.Play(AudioPlayer.Instance.sfx_wrong);
-  
-        }//wrong
+            LeanTween.moveY(obj, Screen.height / 2, time).setEase(LeanTweenType.easeInOutQuart).setDelay(delay);
+        }
 
 
-    }//checkAnswer
+    }//moveWindow
+    #endregion
 
-
-    void GetQuestion()
+    private float refreshTimeout;
+    private void OnRefreshingData()
     {
+        if (gameState.refreshingData)
+        {
+            refreshTimeout += Time.deltaTime;
+        
+            if (FireBaseProvider.Instance.snapshot != null && refreshTimeout >1.5f)
+            {
+                NextSequnce(gameState.nexState);
+                gameState.refreshingData = false;
+                refreshTimeout = 0;
+            }//get updated data
 
-    }//get Question
 
-    void GameEnd()
-    {
 
-    }//GameEnd
+            if (refreshTimeout > 5)
+            {
+                window_disconnected.SetActive(true);
+                gameState.refreshingData = false;
+            }//null
+        }//subscripe snapshot
+
+    }//
+
+    
+
+
 
 }//GameManager

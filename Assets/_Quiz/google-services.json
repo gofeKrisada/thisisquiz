@@ -19,7 +19,11 @@
           "client_type": 3
         }
       ],
-      "api_key": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8vsWBikd5MrOVAg_xYc8A35zv0qtyO3A"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 1
@@ -27,6 +31,50 @@
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:929844342816:android:a3f9d6824e217582",
+        "android_client_info": {
+          "package_name": "com.Gofe.ThisIsQuiz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "929844342816-hn98io583jncpfl2s1ccusl1uncajlp6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.Gofe.ThisIsQuiz",
+            "certificate_hash": "9B9799996FCDA9EF3E83B67923B0FEFDE8B39AA6"
+          }
+        },
+        {
+          "client_id": "929844342816-c6okas5rnf2btc9rsme1r4tk4oq461qp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8vsWBikd5MrOVAg_xYc8A35zv0qtyO3A"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "929844342816-c6okas5rnf2btc9rsme1r4tk4oq461qp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
